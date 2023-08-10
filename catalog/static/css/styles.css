@@ -1,0 +1,41 @@
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-mod{
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    float: right;
+    width: 200px;
+}
+
+//Module Table (modified by Lim)
+.modtable {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+}
+.modtd, .modth {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 3px 16px;
+}
+.modtr:nth-child(even):not(.modtrhg):not{.modtrhy}:not{.modtrhp} {
+    background-color: #dddddd;
+}
+.modtrhg{
+    background-color: #00FF00;
+}
+.modtrhy{
+    background-color: #FFFF00;
+}
+.modtrhp{
+    background-color: #FF99CC;
+}
+
+#id_module{
+    width:250px;
+}
+

@@ -1,0 +1,94 @@
+from django.shortcuts import render
+
+# Create your views here.
+from .models import Experiment, ExperimentInstance, Correlator, Type, Module
+
+def index(request):
+    """
+    View function for home page of site.
+    """
+    # Generate counts of some of the main objects
+    num_exps=Experiment.objects.all().count() ## all experiments ever recorded in database
+    num_instances=ExperimentInstance.objects.all().count()  ## number recording instances
+    ##  number pending extraction module to raid   
+    mod_raid_pend=ExperimentInstance.objects.filter(module_to_raid__exact='p').count()
+    raid_corr_pend=ExperimentInstance.objects.filter(transfer_to_correlator__exact='p').count()  ### number pending upload to corrrelator
+    del_corr_pend=ExperimentInstance.objects.filter(data_status__exact='p').count()  ## correlated, pending deletion from archive
+    num_archive=ExperimentInstance.objects.filter(data_status__exact='n').count()  ## experiments stored in module archive
+    num_mods=Module.objects.count()  # The 'all()' is implied by default.
+    ### for the table in index template
+    inst_p_mod=ExperimentInstance.objects.filter(module_to_raid__exact='p')
+    inst_p_corr=ExperimentInstance.objects.filter(transfer_to_correlator__exact='p')
+    inst_p_del=ExperimentInstance.objects.filter(data_status__exact='p')
+    #modules_available = Module.objects.filter(empty='True').count()
+    # Render the HTML template index.html with the data in the context variable
+    return render(
+        request,
+        'index.html',
+        context={'num_exps':num_exps,'num_instances':num_instances,'mod_raid_pend':mod_raid_pend,
+        'raid_corr_pend':raid_corr_pend,'num_mods':num_mods,'del_corr_pend':del_corr_pend,'num_archive':num_archive,'mod':inst_p_mod,'corr':inst_p_corr,'del':inst_p_del},
+    )
+
+from django.views import generic
+
+class ExperimentListView(generic.ListView):
+    model = Experiment
+    #paginate_by = 35
+
+class ExperimentDetailView(generic.DetailView):
+    model = Experiment
+
+class CorrelatorListView(generic.ListView):
+    model = Correlator
+
+class CorrelatorDetailView(generic.DetailView):
+    model = Correlator
+
+class ModuleListView(generic.ListView):
+    model = Module
+    #paginate_by = 20
+
+class ModuleDetailView(generic.DetailView):
+    model = Module
+
+#### module shipping form
+
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from catalog.forms import RegisterModuleForm
+
+@permission_required('catalog.can_ship')
+def reg_module_station(request, pk):
+    """View function for renewing a specific Module by a station."""
+    module_instance = get_object_or_404(Module, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding):
+        module_register_form = RegisterModuleForm(request.POST)
+
+        # Check if the form is valid:
+        if module_register_form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            module_instance.ship = module_register_form.cleaned_data['shipping_reference']
+            module_instance.save()
+
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('modules') )
+
+    # If this is a GET (or any other method) create the default form.
+    else:
+        pass
+        proposed_ref = "xxxxxxxxxx"
+        module_register_form = RegisterModuleForm(initial={'shipping_reference': proposed_ref})
+
+    context = {
+        'form': module_register_form,
+        'module_instance': module_instance,
+    }
+
+    return render(request, 'catalog/ship_module_station.html', context)

@@ -1,0 +1,248 @@
+from django.db import models
+
+# Create your models here.
+
+class Type(models.Model):
+    """
+    Model representing an experiment type(e.g. rapid, radioastron, austral, r&d).
+    """
+
+
+
+    TYPES = (
+	('r' , 'Rapid'),
+	('ra' , 'Radioastron'),
+	('a', 'Austral'),
+        ('lba', 'LBA'),
+    )
+
+    name = models.CharField(max_length=2, choices = TYPES,  help_text = "Enter experiment type (e.g. rapid, radioastron, austral)")
+    
+    def __str__(self):
+        """
+        String for representing the Model object (in Admin site etc.)
+        """
+        return self.name
+
+from django.urls import reverse #Used to generate URLs by reversing the URL patterns
+
+class Experiment(models.Model):
+    """
+    Model representing an experiment (but not a specific recording of experiment).
+    """
+    name = models.CharField(max_length=6,primary_key=True, unique=True)
+    correlator = models.ForeignKey('Correlator', on_delete=models.SET_NULL, null=True)
+    # Foreign Key used because experiment can only have one correlator, but correlator can have multiple experiments
+    correlation_status = models.BooleanField(default=False)
+    # Correlator as a string rather than object because it hasn't been declared yet in the file.
+    schedate = models.DateField(null=True, blank=True)
+    type = models.ForeignKey(Type, help_text="Select a type for this experiment", null=True, blank=True)
+    # ManyToManyField used because genre can contain many books. Books can cover many genres.
+    # Type class has already been defined so we can specify the object above.
+    
+
+
+
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return self.name
+    
+    
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular experiment instance.
+        """
+        return reverse('experiment-detail', args=[str(self.id)])
+
+
+class ExperimentInstance(models.Model):
+    """
+    Model representing a specific recording of an experiment.
+    """ 
+    #name = models.CharField(max_length=8, primary_key=True, unique=True)
+    experiment = models.ForeignKey('Experiment', on_delete=models.SET_NULL, null=True) 
+    recorded = models.DateField(null=True, blank=True)
+    scans = models.IntegerField(null=True, blank=True)
+    sched_size = models.IntegerField(null=True, help_text="Scheduled experiment data GB")
+    rec_size = models.IntegerField( null=True, help_text="Recorded experiment data GB")
+    module = models.ManyToManyField('Module')
+    STATION = (
+        ('ke', 'Katherine'),
+        ('ho', 'Hobart26'),
+        ('hb', 'Hobart12'),
+        ('yg', 'Yarragadee'),
+    )
+    MODULE = (
+        ('p', 'Pending copy'),
+        ('c', 'Copying'),
+	('u', 'Uploaded'),
+        ('f', 'Failed'),
+    )
+    TRANSFER = (
+        ('p', 'Pending'),
+        ('c', 'Copying'),
+        ('u', 'Uploaded'),
+        ('f', 'Failed'),
+    )
+    DATA = (
+        ('n', 'Not deleted'),
+        ('p', 'Pending, correlated'),
+        ('d', 'Deleted'),
+    )
+
+
+    station = models.CharField(max_length=2, choices=STATION, blank=True, help_text='Station two letter i.d.')
+   
+    module_to_raid = models.CharField(max_length=1, choices=MODULE, blank=True, default='p',null=True, help_text='Module upload to raid status')
+
+    transfer_to_correlator = models.CharField(max_length=1, choices=TRANSFER, blank=True, default='p', help_text='Transfer to correlator status')
+
+    data_status = models.CharField(max_length=1, choices=DATA, blank=True, default='n', help_text='Data on module status')
+
+    def display_module(self):
+        """
+        Creates a string for the module/s. This is required to display modules in Admin list.
+        """
+        return ', '.join([ module.vsn for module in self.module.all()[:3] ])
+    display_module.short_description = 'Module'
+
+    def display_corr_status(self):
+        """
+        Creates a string for the corr_status. This is required to display corr_staus in Admin.
+        """
+        return '%s' % (self.experiment.correlation_status)
+    display_corr_status.short_description = 'correlation complete'
+
+ #  order by date recorded
+    class Meta:
+        ordering = ["recorded"]
+        
+    def __str__(self):
+        """
+        String for representing the Model object
+        """
+        return  '%s%s' % (self.experiment.name, self.station)  #self.station
+
+
+
+
+
+class Module(models.Model):
+    """
+    Model representing module storage.
+    """
+    vsn = models.CharField(max_length=8)
+    size = models.CharField(max_length=10 , help_text = "Module size in GB")
+    free = models.CharField(max_length=10 , help_text = "Free space")
+    
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return self.vsn
+
+
+
+
+
+class Correlator(models.Model):
+    """
+    Model representing the correlator.
+    """
+    
+    CORR = (
+        ('BONN', 'Bonn'),
+        ('HAYS', 'Haystack'),
+	('WASH',  'Washington'),
+	('SHAO', 'Shanghai'),
+        ('VLBA', 'VLBA'),
+	('GSI', 'Geoscience Institute'),
+    )
+
+    name = models.CharField(max_length=4, choices=CORR)
+    storage = models.OneToOneField('Storage', on_delete=models.SET_NULL, null=True)
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular correlator instance.
+        """
+        return reverse('correlator-detail', args=[str(self.id)])
+    
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return self.name
+
+class Storage(models.Model):
+    """
+    Model representing correlator storage.
+    """
+
+    
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100 , help_text = "IP address")
+    port = models.CharField(max_length=100 , help_text = "Port number")
+    freespace = models.CharField(max_length=100, help_text = "Available space in TB")
+    transferrate = models.CharField(max_length=100, help_text = "Available transfer bandwidth")    
+
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular stotrage instance.
+        """
+        return reverse('storage-detail', args=[str(self.id)])
+    
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return self.name
+
+
+class Raid(models.Model):
+    """
+    Model representing local RAID storage.
+    """
+    RAID = (
+        ('bfg8', '/mnt/bfg8'),
+        ('bfg16', '/mnt/bfg16'),
+        ('IVS',  '/mnt/rdsi/IVS'),
+        ('godzilla8', '/mnt/godzilla8'),
+        ('godzilla16', '/mnt/godzilla16'),
+        ('cornucopia', '/mnt/cornucopia'),
+	('AUSTRAL' , '/mnt/rdsi/AUSTRAL'),
+	('astro' , '/mnt/rdsi/astro'),
+	('sirius8' , '/mnt/sirius8'),
+	('sirius16' , '/mnt/sirius16'),
+     )
+
+
+
+    name = models.CharField(max_length=16 , choices=RAID)
+    ip = models.CharField(max_length=16, blank=True, help_text = "IP address")
+    path = models.CharField(max_length=100 , blank=True, help_text = "file system path")
+    freespace = models.DecimalField(max_digits=4,decimal_places=1, help_text = "Available space in TB one decimal place")
+    
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular stotrage instance.
+        """
+        return reverse('raid-detail', args=[str(self.id)])
+    
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return self.name
+
+
+
+

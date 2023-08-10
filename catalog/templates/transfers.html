@@ -1,0 +1,128 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Transfers</h1>
+
+
+
+{% if extract %}
+<h3>Extraction of recording in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Module</th>
+        </tr>
+        {% for item in extract %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.display_module}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if cphob %}
+<h3>Copy to Hobart store in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+        </tr>
+        {% for item in cphob %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if transfer %}
+<h3> Transfer to correlator in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>&nbspCorrelator</th>
+        </tr>
+        {% for item in transfer %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+                <td>&nbsp{{item.display_corr}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if hob %}
+<h3>Pending copy to Hobart storage</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Scans&nbsp</th>
+                <th>Data (GB)&nbsp</th>
+        </tr>
+        {% for item in hob %}
+        <tr>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.scans}}</td>
+                <td>{{ item.rec_size }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+
+
+{% if corr %}
+<h3>Pending upload to correlator</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Scans&nbsp</th>
+                <th>Data (GB)&nbsp</th>
+                <th>Storage Path&nbsp</th>
+                <th>Correlator</th>
+        </tr>
+        {% for item in corr %}
+        <tr>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.scans}}</td>
+                <td>{{ item.rec_size }}</td>
+                <td>{{ item.path}}</td>
+                <td>{{item.display_corr}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if del %}
+<h3>Pending deletion from archive</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station</th>
+                <th>Module VSN&nbsp</th>
+                <th>Raid Location</th>
+
+        </tr>
+        {% for item in del %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.display_module}}</td>
+                <td>{{ item.raid.get_name_display}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+
+{% endblock %}

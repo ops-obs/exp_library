@@ -1,0 +1,179 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1> AUSCOPE IVS LBA Experiment Library Home</h1>
+
+  <p>Welcome to the  <em>AUSCOPE IVS LBA Experiment Library</em> a basic Django website to track data storage and transfer logistics</p>
+
+<h2>Dynamic content</h2>
+
+  <p>The library has the following record counts:</p>
+  <ul>
+    <li><strong>Experiments:</strong> {{ num_exps }}</li>
+    <li><strong>Experiment Recordings:</strong> {{ num_instances }}</li>
+    <li><strong>Experiments archived on module and raid:</strong> {{ num_archive }}</li>
+    <li><strong>Modules total:</strong> {{ num_mods }}</li>
+    <ul>
+    <li><strong> Katherine:</strong> {{ ke_mods }}</li>
+    <li><strong> Yarragadee: </strong>{{ yg_mods }}</li>
+    <li><strong> Ceduna:</strong>{{ cd_mods }}</li>
+    <li><strong> Hobart:</strong> {{ ho_mods }}</li>
+    <li><strong> Tidbinbilla:</strong>{{ ti_mods }}</li>
+    <li><strong> Washington pool:</strong>{{ wn_mods }}</li>
+    </ul>
+    <li><strong>Modules free:</strong> {{ free_mods }}</li>
+    <li><strong>Modules in transit:</strong> {{ transit }}</li>
+    <li><strong>Modules failed:</strong> {{ fail }}</li>
+    <li><strong>Recordings correlated pending deletion:</strong> {{ del_corr_pend }}</li>
+  </ul>
+
+{% if mod %}
+<h3>Pending/current recordings and module allocations</h3>
+<h4>(Up to one week ahead)</h4>
+        <table>
+        <tr>
+                <th>Date&nbsp </th>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Size(GB)&nbsp     </th>
+                <th> Module VSN&nbsp    </th>
+                <th>Module Size&nbsp </th>
+                <th>Free Space&nbsp </th>
+                <th>&nbspShip To </th>
+        </tr>
+        {% for item in mod %}
+        <tr>
+                <td>{{ item.display_date}} &nbsp&nbsp&nbsp</td>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td align="right">{{ item.sched_size }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp&nbsp{{ item.display_module }}</td>
+                <td align="right"> {{ item.display_module_size }}</td>
+                <td align="right">{{ item.display_module_free }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp{{ item.ship_to }}</td>
+        </tr>
+
+        {% endfor %}
+        </table>
+{% endif %}
+ 
+{% if extract %}
+<h3>Extraction of recording in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+		<th>Module</th>
+        </tr>
+        {% for item in extract %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+		<td>{{ item.display_module}}</td>	
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if cphob %}
+<h3>Copy to Hobart store in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+        </tr>
+        {% for item in cphob %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if transfer %}
+<h3> Transfer to correlator in progress...</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+		<th>&nbspCorrelator</th>
+        </tr>
+        {% for item in transfer %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+		<td>&nbsp{{item.display_corr}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+
+{% if hob %}
+<h3>Pending copy to Hobart storage</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Scans&nbsp</th>
+                <th>Data (GB)&nbsp</th>
+        </tr>
+        {% for item in hob %}
+        <tr>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.scans}}</td>
+                <td>{{ item.rec_size }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if corr %}
+<h3>Pending upload to correlator</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Scans&nbsp</th>
+                <th>Data (GB)&nbsp</th>
+                <th>Storage Path&nbsp</th>
+		<th>Correlator</th>
+        </tr>
+        {% for item in corr %}
+        <tr>
+		<td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.scans}}</td>
+                <td>{{ item.rec_size }}</td>
+                <td>{{ item.path}}</td>
+		<td>{{item.display_corr}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if del %}
+<h3>Pending deletion from archive</h3>
+        <table>
+        <tr>
+                <th>Name</th>
+                <th>Station</th>
+		<th>Module VSN&nbsp</th>
+                <th>Raid Location</th>
+       
+        </tr>
+        {% for item in del %}
+        <tr>
+                <td>{{ item.experiment_id }}</td>
+                <td>{{ item.station}}</td>
+                <td>{{ item.display_module}}</td>
+		<td>{{ item.raid.get_name_display}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+{% endif %}
+
+
+{% endblock %}

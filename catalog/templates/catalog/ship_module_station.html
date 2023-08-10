@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Module: {{ module_instance.vsn }}</h1>
+  <p>Station: {{ module_instance.get_location_display }}</p>
+    
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}
+

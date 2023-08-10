@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  {% block title %}<title>Experiment  Library</title>{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+  <!-- Add additional CSS in static file -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+  <script>
+    function sortModule(sb){
+      //alert("Hobart!");
+      var table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("mod_table");
+      switching = true;
+      /*Make a loop that will continue until no switching has been done:*/
+      while (switching) {
+      //start by saying: no switching is done:
+        switching = false;
+        rows = table.rows;
+        /*Loop through all table rows (except the first, which contains table headers):*/
+        for (i = 1; i < (rows.length - 1); i++) {
+          //start by saying there should be no switching:
+          shouldSwitch = false;
+          /*Get the two elements you want to compare, one from current row and one from the next:*/
+          
+      
+            x = rows[i].getElementsByTagName("TD")[4];
+            y = rows[i + 1].getElementsByTagName("TD")[4];
+          }
+          //check if the two rows should switch place:
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+          /*If a switch has been marked, make the switch and mark that a switch has been done:*/
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-sm-2">
+      {% block sidebar %}
+      <ul class="sidebar-nav">
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'experiments' %}">All experiments</a></li>
+          <li><a href="{% url 'correlators' %}">All correlators</a></li>
+          <li><a href="{% url 'modules' %}">All modules</a></li>
+      </ul>
+
+     {% endblock %}
+      </div>
+
+      <div class="col-sm-10 ">
+      {% block content %}{% endblock %}
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Correlator List</h1>
+
+    {% if correlator_list %}
+    <ul>
+
+      {% for correlator in correlator_list %}
+      <li>
+        <a href="{{ correlator.get_absolute_url }}">{{ correlator.name }}</a>
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no correlators in the library.</p>
+    {% endif %}       
+{% endblock %}

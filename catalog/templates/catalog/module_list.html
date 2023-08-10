@@ -1,0 +1,54 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Module  List</h1>
+	<h6><span style="color:#00FF00">:Green:</span> empty <br> <span style="color:#FFFF00">Yellow:</span> in transit to station <br> <span style="color:#FF99CC">Purple:</span>single drive </h4>
+        <h6><b>module sent:</b> go to module and 'ship' to enter shipping reference, set destination shipping location and check 'Transit' checkbox</h6>
+	<h6><b>module received:</b> go to module and 'ship' to uncheck 'Transit' checkbox, check location is correct</h6>
+	<h6><b>module received not in any list? :</b> Create new module record (link below),  or run ~/.mk5vsn.py on Mark5 with module loaded and selected</h6>
+    {% if module_list %}
+    <!--<ul>-->
+    <table class="modtable" id="mod_table">
+      <tr class="modtr">
+        <th class="modth">VSN&nbsp</th>
+        <th class="modth">SIZE&nbsp&nbsp&nbsp</th>
+        <th class="modth">FREE&nbsp</th>
+        <th class="modth">LOCATION&nbsp</th>
+        <th class="modth">LAST MODIFIED&nbsp&nbsp&nbsp</th>
+	<th class="modth"> RECORDINGS ALLOCATED</th>
+      </tr>
+
+      {% for module in module_list %}
+      <!--<li>-->
+       <! -- see catalog/static/css/styles.css file for table colours -->
+      <tr class="modtr{% if module.empty %} modtrhg{% endif %}{% if module.usb %} modtrhp {% endif %}{% if module.transit %} modtrhy{% endif %}">
+        <td class="modtd"><a href="{{ module.get_absolute_url }}">{{ module.vsn }}</a></td>
+        <td class="modtd">{{module.size}}</td>
+        <td class="modtd">{{module.free}}</td>
+        <td class="modtd">{{module.location}}</td>
+        <td class="modtd">{{module.modified}}</td>
+        <td class="modtd">{{module.display_experiments}}</td>
+      </tr>
+      <!--</li>-->
+      {% endfor %}
+
+    <!--</ul>-->
+    {% else %}
+      <p>There are no modules in the library.</p>
+    {% endif %}
+ 
+      <ul class="sidebar-mod">
+        <li><a href="?location=ho">Hobart</a></li>
+        <li><a href="?location=yg">Yarragadee</a></li>
+        <li><a href="?location=ke">Katherine</a></li>
+        <li><a href="?location=cd">Ceduna</a></li>
+        <li><a href="?location=td">Tidbinbilla</a></li>
+        <li><a href="?location=wn">Washington pool</a></li>
+        <li><a href="?location=ff">Failed media</a></li>
+      </ul>
+
+
+
+{% if perms.catalog.can_ship %} <a href="{% url 'module-make'%}">Create new module record</a>  {% endif %}
+       
+{% endblock %}

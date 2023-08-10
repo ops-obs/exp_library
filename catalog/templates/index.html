@@ -1,0 +1,151 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1> AUSCOPE IVS LBA Data Library Home</h1>
+
+  <p>Welcome to the  <em>AUSCOPE IVS LBA Experiment Library</em> a basic Django website to track data storage and transfer logistics</p>
+
+<h2>Dynamic content</h2>
+
+  <p>The library has the following record counts:</p>
+  <ul>
+    <li><strong>Experiments:</strong> {{ num_exps }}</li>
+    <li><strong>Experiment Recordings:</strong> {{ num_instances }}</li>
+    <li><strong>Experiments archived on module and raid:</strong> {{ num_archive }}</li>
+    <li><strong>Modules total:</strong> {{ num_mods }}</li>
+    <ul>
+    <li><strong> Katherine:</strong> {{ ke_mods }}</li>
+    <li><strong> Yarragadee: </strong>{{ yg_mods }}</li>
+    <li><strong> Ceduna:</strong>{{ cd_mods }}</li>
+    <li><strong> Hobart:</strong> {{ ho_mods }}</li>
+    <li><strong> Tidbinbilla:</strong>{{ ti_mods }}</li>
+    <li><strong> Washington pool:</strong>{{ wn_mods }}</li>
+    </ul>
+    <li><strong>Modules free:</strong> {{ free_mods }}</li>
+    <li><strong>Modules in transit:</strong> {{ transit }}</li>
+    <li><strong>Modules failed:</strong> {{ fail }}</li>
+    <li><strong>Recordings correlated pending deletion:</strong> {{ del_corr_pend }}</li>
+  </ul>
+
+{% if mody %}
+<h3>yg  pending/current </h3>
+<h4>( recordings and module allocations up to one week ahead)</h4>
+        <table>
+        <tr>
+                <th>Date&nbsp </th>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Size(GB)&nbsp     </th>
+                <th> Module VSN&nbsp    </th>
+                <th>Module Size&nbsp </th>
+                <th>Free Space&nbsp </th>
+                <th>&nbspShip To </th>
+        </tr>
+        {% for item in mody %}
+        <tr>
+                <td>{{ item.display_date}} &nbsp&nbsp&nbsp</td>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td align="right">{{ item.sched_size }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp&nbsp{{ item.display_module }}</td>
+                <td align="right"> {{ item.display_module_size }}</td>
+                <td align="right">{{ item.display_module_free }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp{{ item.ship_to }}</td>
+        </tr>
+
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if modc %}
+<h3>cd  pending/current</h3>
+<h4>( recordings and module allocations up to one week ahead)</h4>
+        <table>
+        <tr>
+                <th>Date&nbsp </th>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Size(GB)&nbsp     </th>
+                <th> Module VSN&nbsp    </th>
+                <th>Module Size&nbsp </th>
+                <th>Free Space&nbsp </th>
+                <th>&nbspShip To </th>
+        </tr>
+        {% for item in modc %}
+        <tr>
+                <td>{{ item.display_date}} &nbsp&nbsp&nbsp</td>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td align="right">{{ item.sched_size }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp&nbsp{{ item.display_module }}</td>
+                <td align="right"> {{ item.display_module_size }}</td>
+                <td align="right">{{ item.display_module_free }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp{{ item.ship_to }}</td>
+        </tr>
+
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if modk %}
+<h3>ke pending/current</h3>
+<h4>(recordings and module allocations up to one week ahead)</h4>
+        <table>
+        <tr>
+                <th>Date&nbsp </th>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Size(GB)&nbsp     </th>
+                <th> Module VSN&nbsp    </th>
+                <th>Module Size&nbsp </th>
+                <th>Free Space&nbsp </th>
+                <th>&nbspShip To </th>
+        </tr>
+        {% for item in modk %}
+        <tr>
+                <td>{{ item.display_date}} &nbsp&nbsp&nbsp</td>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td align="right">{{ item.sched_size }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp&nbsp{{ item.display_module }}</td>
+                <td align="right"> {{ item.display_module_size }}</td>
+                <td align="right">{{ item.display_module_free }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp{{ item.ship_to }}</td>
+        </tr>
+
+        {% endfor %}
+        </table>
+{% endif %}
+
+{% if modh %}
+<h3>ho/hb pending/current</h3>
+<h4>(recordings and module allocations up to one week ahead)</h4>
+        <table>
+        <tr>
+                <th>Date&nbsp </th>
+                <th>Name</th>
+                <th>Station&nbsp</th>
+                <th>Size(GB)&nbsp     </th>
+                <th> Module VSN&nbsp    </th>
+                <th>Module Size&nbsp </th>
+                <th>Free Space&nbsp </th>
+                <th>&nbspShip To </th>
+        </tr>
+        {% for item in modh %}
+        <tr>
+                <td>{{ item.display_date}} &nbsp&nbsp&nbsp</td>
+                <td><a href="{{item.get_absolute_url}}">{{ item.experiment_id }}</a></td>
+                <td>{{ item.station}}</td>
+                <td align="right">{{ item.sched_size }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp&nbsp{{ item.display_module }}</td>
+                <td align="right"> {{ item.display_module_size }}</td>
+                <td align="right">{{ item.display_module_free }}</td>
+                <td>&nbsp&nbsp&nbsp&nbsp{{ item.ship_to }}</td>
+        </tr>
+
+        {% endfor %}
+        </table>
+{% endif %}
+
+
+{% endblock %}

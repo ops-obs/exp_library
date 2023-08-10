@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1> {{ module.vsn }}</h1>
+
+
+  <p><strong>Size:</strong>&emsp;{{module.size}} </p>
+  <p><strong>Empty:</strong>&emsp;{{module.empty}} </p>
+  <p><strong>Recordings:</strong>&emsp;{{module.display_experiments}} </p>
+  <p><strong>Located at (or shipping to) {{module.get_location_display}} </strong>on {{module.modified}}</p>
+  <p><strong>Shipping Reference:</strong>&emsp;{{module.ship}} </p>
+  <p><strong>In transit:</strong>&emsp;{{module.transit}} </p>  
+{% if perms.catalog.can_ship %} <a href="{% url 'module-ship' module.vsn%}">Ship</a>  {% endif %}
+{% endblock %}

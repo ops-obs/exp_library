@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Session: {{ experiment.name }}</h1>
+
+  <p><strong>Correlator:</strong> &emsp;<a href="{{ experiment.correlator.get_absolute_url }}">{{ experiment.correlator_id }}</a></p> 
+  <p><strong>Date Scheduled:</strong> &emsp;{{ experiment.schedate }}</p>
+  <p><strong>Correlated:</strong> {{ experiment.correlation_status }}</p>   
+  <p><strong>Type:</strong> {% for type in experiment.type.all %} {{ type }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>  
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h3>Recordings</h3>
+
+    {% for copy in experiment.experimentinstance_set.all %}
+    <hr>
+    <p><strong>Station:</strong> &emsp;{{copy.station}}</p>
+    <p><strong>Module: {{copy.display_module}}</p>
+    <p><strong>Number of scans recorded:</strong>&emsp;{{copy.scans}} </p>
+    <p><strong>Archive local location:</strong>&emsp;{{copy.raid.get_name_display}} </p>
+    <p><strong>Path on archive:</strong>&emsp;{{copy.path}} </p> 
+    {% if copy.transfer != 'u' %}<p><strong>Number of scans pending transfer to <a href="{{ experiment.correlator.get_absolute_url }}">{{ experiment.correlator_id }}</a>:</strong>&emsp;{{copy.scans}} </p>{% endif %}
+    <p><strong>Sceduled data size </strong>&emsp; {{copy.sched_size}} GB</p>
+    <p><strong>Recorded data size </strong>&emsp; {{copy.rec_size}} GB</p>
+    <p class="text-muted"><strong>Id:</strong>&emsp; {{copy.experiment}}{{copy.station}}</p>
+    {% if perms.catalog.can_ship %} <a href="{% url 'module-allocate' copy.id %}">Allocate Module</a>  {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}
