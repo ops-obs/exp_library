@@ -3,6 +3,25 @@ from django.forms import ModelForm
 # Create your models here.
 # if you edit here and migration fails then delete migration (created by makemigrations) in catalog/migrations 
 
+class Scan(models.Model):
+    """
+    individual scan from experiment instance
+    """
+    name = models.CharField(max_length=30, primary_key=True, unique=True)
+    instance = models.ForeignKey('ExperimentInstance', on_delete=models.SET_NULL, null=True)
+    size = models.BigIntegerField( null=True,blank=True, help_text="Recorded scan data in Bytes")
+      
+    """ scan state; extract, here, uploaded  """
+    etx = models.BooleanField(default=False, help_text='scan copied from original')
+    htx = models.BooleanField(default=False, help_text='scan moved to local store; here at hobart')
+    ctx = models.BooleanField(default=False, help_text='scan transferred to correlator')
+      
+    def __str__(self):
+        """
+        String for representing the Model object (in Admin site etc.)
+        """
+        return self.name
+
 class Type(models.Model):
     """
     Model representing an experiment type(e.g. rapid, radioastron, austral, r&d).
@@ -78,7 +97,7 @@ class ExperimentInstance(models.Model):
 #    id = models.CharField(max_length=10, primary_key=True,  default= id_str )
     experiment = models.ForeignKey('Experiment', on_delete=models.SET_NULL, null=True) 
     recorded = models.DateField(null=True, blank=True)
-    scans = models.IntegerField(null=True, blank=True)
+    scans = models.IntegerField(null=True, blank=True, help_text="Total number of scans")
     sched_size = models.IntegerField(null=True, blank=True, help_text="Scheduled experiment data GB")
     rec_size = models.IntegerField( null=True,blank=True, help_text="Recorded experiment data GB")
     module  = models.ManyToManyField('Module', help_text="Module vsn", blank=True)
@@ -95,12 +114,6 @@ class ExperimentInstance(models.Model):
         ('hi', 'Hitachi'),
         ('kb', 'Kashima'),
         ('wa', 'Warkworth')
-    )
-    MODULE = (
-        ('p', 'Pending copy'),
-        ('c', 'Copying'),
-	('u', 'Uploaded'),
-        ('f', 'Failed'),
     )
     TRANSFER = (
         ('p', 'Pending'),
@@ -120,16 +133,16 @@ class ExperimentInstance(models.Model):
 
     """"  
     """" represents extraction of recording from module , or flexbuff recording to media"""
-    extract = models.CharField(max_length=1, choices=MODULE, blank=True, default='p',  help_text='Recording has been copied')
+    extract = models.CharField(max_length=1, choices=TRANSFER, blank=True, default='p',  help_text='Recording has been copied')
     
     """" represents copy to  Hobart storages. If extract  is directly to Hobart then check this one at the same time"""
-    hobart = models.CharField(max_length=1, choices=TRANSFER, default='p',  help_text='Transferred to Hobart storage')
+    hobart = models.CharField(max_length=1, choices=TRANSFER, blank=True, default='p',  help_text='Transferred to Hobart storage')
 
     """ flexbuff is itself, both like a module (recording medium) and a RAID for storage """
     raid = models.ForeignKey('Raid', on_delete=models.SET_NULL, null=True, blank=True)    
     
     """ represents transfer to remote or local (Hobart) correlator """
-    transfer = models.CharField(max_length=1, choices=TRANSFER, default='p',  help_text='Transfer to correlator status')
+    transfer = models.CharField(max_length=1, choices=TRANSFER, blank=True, default='p',  help_text='Transfer to correlator status')
 
     data_status = models.CharField(max_length=1, choices=DATA, blank=True, default='n',  help_text='Data on module status')
 
